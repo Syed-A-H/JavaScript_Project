@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:svg="http://www.w3.org/2000/svg"
+      xmlns:vml="urn:schemas-microsoft-com:vml">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>JSGL empty page template</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />
+    <!--[if vml]><style>vml\:* {behavior: url(#default#VML);}</style><![endif]-->
+    <script type="text/javascript" src="./jsgl.min.js"></script>
+  </head>
+  <body>
+	<p id="angle">TEST</p>
+    <div id="panel" style="width: 840px; height: 840px"></div>
+    <script type="text/javascript">
+      /* Instantiate JSGL Panel. */
+      myPanel = new jsgl.Panel(document.getElementById("panel"));
+ 
+      /* Start drawing! */
+	  var leftTop = new jsgl.Vector2D(0,0);
+	  var leftBottom = new jsgl.Vector2D(0,840);
+	  var rightTop = new jsgl.Vector2D(840,0);
+	  var rightBottom = new jsgl.Vector2D(840,840);
+	  
+	  var topLine = myPanel.createLine();
+	  topLine.setStartPoint(leftTop);
+	  topLine.setEndPoint(rightTop);
+	  topLine.getStroke().setWeight(6);
+	  myPanel.addElement(topLine);
+	  
+	  var rightLine = myPanel.createLine();
+	  rightLine.setStartPoint(rightTop);
+	  rightLine.setEndPoint(rightBottom);
+	  rightLine.getStroke().setWeight(6);
+	  myPanel.addElement(rightLine);
+	  
+	  var leftLine = myPanel.createLine();
+	  leftLine.setStartPoint(leftTop);
+	  leftLine.setEndPoint(leftBottom);
+	  leftLine.getStroke().setWeight(6);
+	  myPanel.addElement(leftLine);
+	  
+	  var bottomLine = myPanel.createLine();
+	  bottomLine.setStartPoint(leftBottom);
+	  bottomLine.setEndPoint(rightBottom);
+	  bottomLine.getStroke().setWeight(6);
+	  myPanel.addElement(bottomLine);
+	  
+	  var refStartX = 420;
+	  var refStartY = 420;
+	  var refEndX = 840;
+	  var refEndY = 420;
+	 
+	  
+	  var myLine = myPanel.createLine(); //Reference Line
+	  myLine.setStartPointXY(refStartX,refStartY);
+	  myLine.setEndPointXY(refEndX,refEndY);
+	  var lengthx = refEndX-refStartX; 
+	  var lengthy = refEndY-refStartY;
+	  var len = Math.sqrt(Math.pow(lengthx,2) + Math.pow(lengthy,2));
+	  myPanel.addElement(myLine);
+	  
+	  document.getElementById("angle").innerHTML = len; 
+	  
+	  var my2Line = myPanel.createLine();
+	  my2Line.setStartPointXY(refStartX,refStartY);
+	  my2Line.setEndPointXY(180,40);
+	  //myPanel.addElement(my2Line);
+	  
+	  var lines= [];
+	  
+	  for (i = 0; i < 1; i++){
+		lines[i] = myPanel.createLine();
+		lines[i].setStartPointXY(refStartX,refStartY);
+		lines[i].setEndX(getX((Math.PI/4)*len));
+		lines[i].setEndY(getY((Math.PI/4)*len));
+		myPanel.addElement(lines[i]);
+	  }
+	  
+	  
+	  function getX(theta){
+		x = Math.sin(theta);
+		return x;
+	  }
+	  
+	  function getY(theta){
+		y = Math.cos(theta);
+		return y;
+	  }
+	  
+    </script>
+  </body>
+</html>
