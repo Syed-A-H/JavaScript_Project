@@ -12,16 +12,20 @@
   </head>
   <body>
 	<p id="angle">TEST</p>
+	<p id="angle1">TEST</p>
+	<p id="angle2">TEST</p>
     <div id="panel" style="width: 840px; height: 840px"></div>
     <script type="text/javascript">
       /* Instantiate JSGL Panel. */
       myPanel = new jsgl.Panel(document.getElementById("panel"));
  
       /* Start drawing! */
+	  var wide = 840;
+	  var high = 840;
 	  var leftTop = new jsgl.Vector2D(0,0);
-	  var leftBottom = new jsgl.Vector2D(0,840);
-	  var rightTop = new jsgl.Vector2D(840,0);
-	  var rightBottom = new jsgl.Vector2D(840,840);
+	  var leftBottom = new jsgl.Vector2D(0,high);
+	  var rightTop = new jsgl.Vector2D(wide,0);
+	  var rightBottom = new jsgl.Vector2D(wide,high);
 	  
 	  var topLine = myPanel.createLine();
 	  topLine.setStartPoint(leftTop);
@@ -46,39 +50,70 @@
 	  bottomLine.setEndPoint(rightBottom);
 	  bottomLine.getStroke().setWeight(6);
 	  myPanel.addElement(bottomLine);
-	  
+	  /*
 	  var refStartX = 420;
 	  var refStartY = 420;
 	  var refEndX = 840;
 	  var refEndY = 420;
-	 
+	  */
 	  
-	  var myLine = myPanel.createLine(); //Reference Line
-	  myLine.setStartPointXY(refStartX,refStartY);
-	  myLine.setEndPointXY(refEndX,refEndY);
-	  var lengthx = refEndX-refStartX; 
-	  var lengthy = refEndY-refStartY;
-	  var len = Math.sqrt(Math.pow(lengthx,2) + Math.pow(lengthy,2));
-	  myPanel.addElement(myLine);
 	  
-	  document.getElementById("angle").innerHTML = len; 
+	  var myBase = myPanel.createLine(); //Reference Line
+	  myBase.setStartPoint(shiftCoords(0,0));
+	  myBase.setEndPoint(shiftCoords(100,0));
+	  myBase.getStroke().setColor('rgb(255,0,0)');
+	  myBase.getStroke().setWeight(4);
+	  myPanel.addElement(myBase);
+	  
+	  
+	  label = myPanel.createLabel();
+	  label.setLocation(shiftCoords(50,-10));
+	  label.setText("Base: Length " + getLength(myBase));
+	  myPanel.addElement(label);
+	  
+	  var myHeight = myPanel.createLine(); //Reference Line
+	  myHeight.setStartPoint(shiftCoords(100,0));
+	  myHeight.setEndPoint(shiftCoords(150,250));
+	  myHeight.getStroke().setColor('rgb(255,0,0)');
+	  myHeight.getStroke().setWeight(4);
+	  myPanel.addElement(myHeight);
+	  
+	  
+	   
 	  
 	  var my2Line = myPanel.createLine();
-	  my2Line.setStartPointXY(refStartX,refStartY);
-	  my2Line.setEndPointXY(180,40);
-	  //myPanel.addElement(my2Line);
+	  my2Line.setStartPoint(shiftCoords(0,0));
+	  my2Line.setEndPoint(shiftCoords(150,250));
+	  my2Line.getStroke().setColor('rgb(255,0,0)');
+	  my2Line.getStroke().setWeight(4)
+	  myPanel.addElement(my2Line);
 	  
+	  myPanel.addClickListener(function(eventArgs) {
+	  myHeight.setEndPointXY(eventArgs.getX(), eventArgs.getY());
+	  });
+	  
+	  myPanel.addClickListener(function(eventArgs) {
+	  my2Line.setEndPointXY(eventArgs.getX(), eventArgs.getY());
+	  });
+	  
+	  
+	  //document.getElementById("angle").innerHTML = getLength(my2Line);
+	  /*
 	  var lines= [];
 	  
 	  for (i = 0; i < 1; i++){
 		lines[i] = myPanel.createLine();
-		lines[i].setStartPointXY(refStartX,refStartY);
+		lines[i].setStartPoint(shiftCoords(0,0));
 		lines[i].setEndX(getX((Math.PI/4)*len));
 		lines[i].setEndY(getY((Math.PI/4)*len));
 		myPanel.addElement(lines[i]);
 	  }
+	  */
+	  setxAxis();
+	  setyAxis();
 	  
-	  
+	  document.getElementById("angle1").innerHTML = calcAngle(myBase,my2Line);
+
 	  function getX(theta){
 		x = Math.sin(theta);
 		return x;
@@ -87,6 +122,77 @@
 	  function getY(theta){
 		y = Math.cos(theta);
 		return y;
+	  }
+	  
+	  //set the x-axis
+	  function setxAxis(){
+		x_axis = myPanel.createLine();
+		x_axis.setStartPointXY(0,high/2);
+		x_axis.setEndPointXY(wide,high/2);
+		x_axis.getStroke().setWeight(2);
+		x_axis.getStroke().setOpacity(0.70);
+		myPanel.addElement(x_axis);
+	  }
+	  
+	  //set the y-axis
+	  function setyAxis(){
+		y_axis = myPanel.createLine();
+		y_axis.setStartPointXY(wide/2,0);
+		y_axis.setEndPointXY(wide/2,high);
+		y_axis.getStroke().setWeight(2);
+		y_axis.getStroke().setOpacity(0.70);
+		myPanel.addElement(y_axis);
+	  }
+	  
+	  
+	  //shifts coords x and y so that the origin is the middle of the panel.
+	  function shiftCoords(xcoord,ycoord){
+		  var ret = new jsgl.Vector2D();
+		  ret.setX(xcoord+(wide/2));
+		  ret.setY((high/2)-ycoord);
+		  return ret;
+	  }
+	  
+	  //Accepts a line object and returns the length of it
+	  function getLength(line){
+		var lengthx = Math.abs(line.getEndX() - line.getStartX()); 
+		var lengthy = Math.abs(line.getEndY() - line.getStartY()); 
+		var len = Math.sqrt(Math.pow(lengthx,2) + Math.pow(lengthy,2));
+		return len;
+	  }
+	  
+	  function createAngle(line, theta){
+		  var line2 = new jsgl.Vector2D();
+		  line2.setX(line.getEndX()*(1 + Math.sin(theta)));
+		  line2.setY(line.getEndY()*(1 + Math.cos(theta)));
+		  //line2.setY((high/2) - Math.abs((line.getEndY()*(1 + Math.cos(theta)))));
+		  
+		  line2 = shiftCoords(line2.getX(),line2.getY())
+		 
+		  return line2;
+	  }
+	  
+	  
+	  //Accepts two lines and return the angle between them
+	  //assumes that the lines form a right angle
+	  //Can change to remove that assumption
+	  function calcAngle(line1, line2){
+		  if (line1.getStartX() != line2.getStartX() ||
+				line1.getStartY() != line2.getStartY()){
+			  return -1;
+		  }
+		  else{
+			  var a = myPanel.createLine();
+			  a.setStartPointXY(line1.getEndX(),line1.getEndY());
+			  a.setEndPointXY(line2.getEndX(),line2.getEndY());
+			  var alen = getLength(a);
+			  var blen = getLength(line1);
+			  var clen = getLength(line2);
+			  document.getElementById("angle2").innerHTML = alen + " " + blen + " " + clen;
+			  var angle = Math.acos((Math.pow(blen,2) + Math.pow(clen,2) - Math.pow(alen,2))/(2*blen*clen));
+			  angle = angle *(180/Math.PI);
+		  }
+		  return angle;
 	  }
 	  
     </script>
