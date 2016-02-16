@@ -15,6 +15,10 @@
 	<p id="angle">TEST</p>
 	<p id="angle1">TEST</p>
 	<p id="angle2">TEST</p>
+	<p id="Mouse">TEST</p>
+	X-Coordinate: <input type="text" id="xCoords" value="">
+	Y-Coordinate: <input type="text" id="yCoords" value="">
+	<button onclick = "setPoint()">Set</button>
     <div id="panel" style="width: 840px; height: 840px"></div>
     <script type="text/javascript">
       /* Instantiate JSGL Panel. */
@@ -31,52 +35,49 @@
 	  var topLine = myPanel.createLine();
 	  topLine.setStartPoint(leftTop);
 	  topLine.setEndPoint(rightTop);
-	  topLine.getStroke().setWeight(6);
+	  topLine.getStroke().setWeight(8);
 	  myPanel.addElement(topLine);
 	  
 	  var rightLine = myPanel.createLine();
 	  rightLine.setStartPoint(rightTop);
 	  rightLine.setEndPoint(rightBottom);
-	  rightLine.getStroke().setWeight(6);
+	  rightLine.getStroke().setWeight(8);
 	  myPanel.addElement(rightLine);
 	  
 	  var leftLine = myPanel.createLine();
 	  leftLine.setStartPoint(leftTop);
 	  leftLine.setEndPoint(leftBottom);
-	  leftLine.getStroke().setWeight(6);
+	  leftLine.getStroke().setWeight(8);
 	  myPanel.addElement(leftLine);
 	  
 	  var bottomLine = myPanel.createLine();
 	  bottomLine.setStartPoint(leftBottom);
 	  bottomLine.setEndPoint(rightBottom);
-	  bottomLine.getStroke().setWeight(6);
+	  bottomLine.getStroke().setWeight(8);
 	  myPanel.addElement(bottomLine);
-	  /*
-	  var refStartX = 420;
-	  var refStartY = 420;
-	  var refEndX = 840;
-	  var refEndY = 420;
-	  */
+
+
+	 // Border is Set ///
 	  
 	  
-	  var myBase = myPanel.createLine(); //Reference Line
+	  var myBase = myPanel.createLine();
 	  myBase.setStartPoint(shiftCoords(0,0));
 	  myBase.setEndPoint(shiftCoords(100,0));
 	  myBase.getStroke().setColor('rgb(255,0,0)');
-	  myBase.getStroke().setWeight(4);
+	  myBase.getStroke().setWeight(6);
 	  myPanel.addElement(myBase);
 	  
 	  
-	  label = myPanel.createLabel();
+	  var label = myPanel.createLabel();
 	  label.setLocation(shiftCoords(50,-10));
 	  label.setText("Base: Length " + getLength(myBase));
 	  myPanel.addElement(label);
 	  
-	  var myHeight = myPanel.createLine(); //Reference Line
+	  var myHeight = myPanel.createLine();
 	  myHeight.setStartPoint(shiftCoords(100,0));
 	  myHeight.setEndPoint(shiftCoords(150,250));
 	  myHeight.getStroke().setColor('rgb(255,0,0)');
-	  myHeight.getStroke().setWeight(4);
+	  myHeight.getStroke().setWeight(6);
 	  myPanel.addElement(myHeight);
 	  
 	  
@@ -86,17 +87,9 @@
 	  my2Line.setStartPoint(shiftCoords(0,0));
 	  my2Line.setEndPoint(shiftCoords(150,250));
 	  my2Line.getStroke().setColor('rgb(255,0,0)');
-	  my2Line.getStroke().setWeight(4)
+	  my2Line.getStroke().setWeight(6)
 	  myPanel.addElement(my2Line);
-	  
-	  myPanel.addClickListener(function(eventArgs) {
-	  myHeight.setEndPointXY(eventArgs.getX(), eventArgs.getY());
-	  });
-	  
-	  myPanel.addClickListener(function(eventArgs) {
-	  my2Line.setEndPointXY(eventArgs.getX(), eventArgs.getY());
-	  });
-	  
+
 	  
 	  //document.getElementById("angle").innerHTML = getLength(my2Line);
 	  /*
@@ -112,7 +105,50 @@
 	  */
 	  setxAxis();
 	  setyAxis();
+
+	myHeight.addMouseOverListener(function(eventArgs){
+	myHeight_label = myPanel.createLabel();
+	myHeight_label.setLocationXY(myHeight.getStartX()/2,myHeight.getStartY());
+	myHeight_label.setText(getLength(myHeight));	
+	myPanel.addElement(myHeight_label);
+	myHeight.getStroke().setColor('rgb(145,25,100)');
+	});
+	myHeight.addMouseOutListener(function(eventArgs){	
+	myPanel.removeElement(myHeight_label);
+	myHeight.getStroke().setColor('rgb(255,0,0)');
+	});
+
+
+	my2Line.addMouseOverListener(function(eventArgs){
+	my2Line_label = myPanel.createLabel();
+	my2Line_label.setLocationXY(my2Line.getEndX()/2,my2Line.getEndY());
+	my2Line_label.setText(getLength(my2Line));	
+	myPanel.addElement(my2Line_label);
+	my2Line.getStroke().setColor('rgb(145,25,100)');
+	});
+	my2Line.addMouseOutListener(function(eventArgs){	
+	myPanel.removeElement(my2Line_label);
+	my2Line.getStroke().setColor('rgb(255,0,0)');
+	});
+
 	  
+	  myPanel.addClickListener(function(eventArgs) {
+	  myHeight.setEndPoint(eventArgs.getLocation());
+	  });
+	  
+	  myPanel.addClickListener(function(eventArgs) {
+	  my2Line.setEndPoint(eventArgs.getLocation());
+	  document.getElementById("angle1").innerHTML = calcAngle(myBase,my2Line);
+	  });
+	    
+	myPanel.addMouseMoveListener(function(eventArgs) {
+	 document.getElementById("Mouse").innerHTML = eventArgs.getX() + " " + eventArgs.getY();
+	  });
+
+
+
+			  
+
 	  document.getElementById("angle1").innerHTML = calcAngle(myBase,my2Line);
 
 	  function getX(theta){
@@ -173,10 +209,42 @@
 		  return line2;
 	  }
 	  
+
+
+
+
+
+
+var handler = function(eventArgs) {
+  var text;
+  switch(eventArgs.getEventType()) {
+case jsgl.MouseEvent.CLICK:
+      text = "click";
+      break;
+    case jsgl.MouseEvent.OVER:
+      text = "Length: " + getLength(line);
+	document.getElementById("angle1").innerHTML = getLength(line)	;
+      break;
+  //  case jsgl.MouseEvent.OUT:
+    //  text = "";
+     // break;
+  }
+var line_label = myPanel.createLabel();
+line_label.setLocationXY(myHeight.getEndX(),myHeight.getEndY());
+line_label.setText(text);	
+myPanel.addElement(line_label);
+
+}
+
+
+function setPoint(){
+	var x = document.getElementById("xCoords").value;
+	var y = document.getElementById("yCoords").value;
+}
+
 	  
-	  //Accepts two lines and return the angle between them
-	  //assumes that the lines form a right angle
-	  //Can change to remove that assumption
+			  //Accepts two lines and return the angle between them
+			  //Using Cosine Law
 	  function calcAngle(line1, line2){
 		  if (line1.getStartX() != line2.getStartX() ||
 				line1.getStartY() != line2.getStartY()){
@@ -195,7 +263,7 @@
 		  }
 		  return angle;
 	  }
-	  
+	  /* Add textboxes for setting of each line,  */
     </script>
   </body>
 </html>
